@@ -13,12 +13,15 @@ type userHandler struct {
 
 func New(e *echo.Echo, srv domain.Service) {
 	handler := userHandler{srv: srv}
+	e.POST("/users", handler.Register())
+	e.PUT("/users", handler.UpdateProfile())
+	e.GET("/users/:id", handler.Profile())
 	e.GET("/users", handler.ShowAllUser())
-	e.POST("/users", handler.AddUser())
-	// e.GET("/users/:id", handler)
+	e.DELETE("/users", handler.DeleteUser())
 }
 
-func (us *userHandler) AddUser() echo.HandlerFunc {
+// registrasi add user
+func (us *userHandler) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input RegisterFormat
 		if err := c.Bind(&input); err != nil {
@@ -35,22 +38,37 @@ func (us *userHandler) AddUser() echo.HandlerFunc {
 
 }
 
-// func (us *userHandler) UpdateProfile() (domain.Core, error) {
+// update user
+func (us *userHandler) UpdateProfile() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var up RegisterFormat
+		if err := c.Bind(&up); err != nil {
+			return c.JSON(http.StatusBadRequest, FailResponse("Cant bind update data"))
+		}
+		cnv := ToDomain(up)
+		res, err := us.srv.UpdateProfile(cnv)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 
-// }
-// func (us *userHandler) Profile() (domain.Core, error) {
-// 	res, err := us.qry.Get(ID)
-// 	if err != nil {
-// 		log.Error(err.Error())
-// 		if strings.Contains(err.Error(), "table") {
-// 			return domain.Core{}, errors.New("database error")
-// 		} else if strings.Contains(err.Error(), "found") {
-// 			return domain.Core{}, errors.New("no data")
-// 		}
-// 	}
+		}
+		return c.JSON(http.StatusAccepted, SuccessResponse("berhasil update", res))
+	}
+}
 
-//		return res, nil
-//	}
+// ambil ID User
+func (us *userHandler) Profile() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var ID uint
+		res, err := us.srv.Profile(ID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+		}
+
+		return c.JSON(http.StatusFound, SuccessResponse("berhasil menemukan data", res))
+	}
+}
+
+// ambil semua data
 func (us *userHandler) ShowAllUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		res, err := us.srv.ShowAllUser()
@@ -59,5 +77,22 @@ func (us *userHandler) ShowAllUser() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, SuccessResponse("success get all user", ToResponse(res, "all")))
+	}
+}
+
+// hapus data
+func (us *userHandler) DeleteUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var del DeleteFormat
+		if err := c.Bind(&del); err != nil {
+			return c.JSON(http.StatusBadRequest, FailResponse("Cant bind update data"))
+		}
+
+		cnv := ToDomain(del)
+		res, err := us.srv.DeleteUser(cnv)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+		}
+		return c.JSON(http.StatusAccepted, SuccessResponse("berhasil hapus data", res))
 	}
 }

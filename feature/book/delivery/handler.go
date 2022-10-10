@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"bookapi/feature/book/domain"
+	//"bookapi/feature/book/repository"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -45,3 +46,11 @@ func (bs *bookHandler) ShowAllBook() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, SuccessResponse("success get all user", ToResponse(res, "all")))
 	}
 }
+
+// func (bs *bookHandler) DeleteBook() echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		var ID uint
+// 		res, err :
+
+// 	}
+// }

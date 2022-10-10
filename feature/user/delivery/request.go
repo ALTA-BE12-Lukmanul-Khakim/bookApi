@@ -10,6 +10,10 @@ type RegisterFormat struct {
 	Password string `json:"password" form:"password"`
 }
 
+type DeleteFormat struct {
+	Nama string `json:"nama" form:"nama"`
+}
+
 type LoginFormat struct {
 	HP       string `json:"hp" form:"hp"`
 	Password string `json:"password" form:"password"`

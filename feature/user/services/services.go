@@ -19,6 +19,7 @@ func New(repo domain.Repository) domain.Service {
 	}
 }
 
+// registrasi Add User
 func (us *userService) AddUser(newUser domain.Core) (domain.Core, error) {
 	generate, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 
@@ -40,6 +41,8 @@ func (us *userService) AddUser(newUser domain.Core) (domain.Core, error) {
 
 	return res, nil
 }
+
+// Update Data User
 func (us *userService) UpdateProfile(updatedData domain.Core) (domain.Core, error) {
 	if updatedData.Password != "" {
 		generate, err := bcrypt.GenerateFromPassword([]byte(updatedData.Password), bcrypt.DefaultCost)
@@ -59,6 +62,8 @@ func (us *userService) UpdateProfile(updatedData domain.Core) (domain.Core, erro
 
 	return res, nil
 }
+
+// ambil ID user
 func (us *userService) Profile(ID uint) (domain.Core, error) {
 	res, err := us.qry.Get(ID)
 	if err != nil {
@@ -72,6 +77,8 @@ func (us *userService) Profile(ID uint) (domain.Core, error) {
 
 	return res, nil
 }
+
+// ambil semua data
 func (us *userService) ShowAllUser() ([]domain.Core, error) {
 	res, err := us.qry.GetAll()
 	if err != nil {
@@ -86,6 +93,21 @@ func (us *userService) ShowAllUser() ([]domain.Core, error) {
 	if len(res) == 0 {
 		log.Info("no data")
 		return nil, errors.New("no data")
+	}
+
+	return res, nil
+}
+
+// DeleteUser implements domain.Service
+func (us *userService) DeleteUser(deleteUser domain.Core) (domain.Core, error) {
+	res, err := us.qry.Delete(deleteUser)
+	if err != nil {
+		log.Error(err.Error())
+		if strings.Contains(err.Error(), "table") {
+			return domain.Core{}, errors.New("database error")
+		} else if strings.Contains(err.Error(), "found") {
+			return domain.Core{}, errors.New("no data")
+		}
 	}
 
 	return res, nil

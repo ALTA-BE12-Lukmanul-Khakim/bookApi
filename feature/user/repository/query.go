@@ -16,6 +16,7 @@ func New(dbConn *gorm.DB) domain.Repository {
 	}
 }
 
+// Add User
 func (rq *repoQuery) Insert(newUser domain.Core) (domain.Core, error) {
 	var cnv User
 	cnv = FromDomain(newUser)
@@ -27,6 +28,7 @@ func (rq *repoQuery) Insert(newUser domain.Core) (domain.Core, error) {
 	return newUser, nil
 }
 
+// Update Data User
 func (rq *repoQuery) Update(updatedData domain.Core) (domain.Core, error) {
 	var cnv User
 	cnv = FromDomain(updatedData)
@@ -37,6 +39,8 @@ func (rq *repoQuery) Update(updatedData domain.Core) (domain.Core, error) {
 	updatedData = ToDomain(cnv)
 	return updatedData, nil
 }
+
+// Ambil ID user
 func (rq *repoQuery) Get(ID uint) (domain.Core, error) {
 	var resQry User
 	if err := rq.db.First(&resQry, "ID = ?", ID).Error; err != nil {
@@ -46,6 +50,8 @@ func (rq *repoQuery) Get(ID uint) (domain.Core, error) {
 	res := ToDomain(resQry)
 	return res, nil
 }
+
+// Ambil semua Data
 func (rq *repoQuery) GetAll() ([]domain.Core, error) {
 	var resQry []User
 	if err := rq.db.Find(&resQry).Error; err != nil {
@@ -56,6 +62,13 @@ func (rq *repoQuery) GetAll() ([]domain.Core, error) {
 	return res, nil
 }
 
-// func (rq *repoQuery) Delete() error {
-
-// }
+// Delete implements domain.Repository
+func (rq *repoQuery) Delete(deleteUser domain.Core) (domain.Core, error) {
+	var cnv User
+	cnv = FromDomain(deleteUser)
+	if err := rq.db.Delete(&cnv).Error; err != nil {
+		return domain.Core{}, err
+	}
+	deleteData := ToDomain(cnv)
+	return deleteData, nil
+}

@@ -2,6 +2,8 @@ package database
 
 import (
 	"bookapi/config"
+	rBook "bookapi/feature/book/repository"
+	rUser "bookapi/feature/user/repository"
 	"fmt"
 
 	"github.com/labstack/gommon/log"
@@ -23,9 +25,11 @@ func InitDB(c *config.AppConfig) *gorm.DB {
 		log.Error("db config error :", err.Error())
 		return nil
 	}
+	migrateDB(db)
 	return db
 }
 
 func migrateDB(db *gorm.DB) {
-	// db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&rUser.User{})
+	db.AutoMigrate(&rBook.Book{})
 }
