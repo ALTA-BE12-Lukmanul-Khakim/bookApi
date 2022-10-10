@@ -28,6 +28,17 @@ func (rq *repoQuery) Insert(newUser domain.Core) (domain.Core, error) {
 	return newUser, nil
 }
 
+// GetUser implements domain.Repository
+func (rq *repoQuery) GetUser(Nama string, Password string) (domain.Core, error) {
+	var resQry User
+	if err := rq.db.Where("Nama = ? and Password =?", Nama, Password).First(&resQry).Error; err != nil {
+		return domain.Core{}, err
+	}
+
+	loginUser := ToDomain(resQry)
+	return loginUser, nil
+}
+
 // Update Data User
 func (rq *repoQuery) Update(updatedData domain.Core) (domain.Core, error) {
 	var cnv User

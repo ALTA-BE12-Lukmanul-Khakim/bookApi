@@ -15,7 +15,7 @@ type DeleteFormat struct {
 }
 
 type LoginFormat struct {
-	HP       string `json:"hp" form:"hp"`
+	Nama     string `json:"nama" form:"nama"`
 	Password string `json:"password" form:"password"`
 }
 
@@ -26,7 +26,7 @@ func ToDomain(i interface{}) domain.Core {
 		return domain.Core{Nama: cnv.Nama, HP: cnv.HP, Password: cnv.Password}
 	case LoginFormat:
 		cnv := i.(LoginFormat)
-		return domain.Core{HP: cnv.HP, Password: cnv.Password}
+		return domain.Core{Nama: cnv.Nama, Password: cnv.Password}
 	}
 	return domain.Core{}
 }

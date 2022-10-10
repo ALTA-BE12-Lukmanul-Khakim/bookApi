@@ -15,7 +15,7 @@ type Repository interface { // Data /Repository (berhubungan dg DB)
 	Get(ID uint) (Core, error)
 	GetAll() ([]Core, error)
 	Delete(deleteUser Core) (Core, error)
-	//GetUser(Nama, Password string) (Core, error)
+	GetUser(Nama, Password string) (Core, error)
 }
 
 type Service interface { // Bisnis logic
@@ -24,5 +24,5 @@ type Service interface { // Bisnis logic
 	Profile(ID uint) (Core, error)
 	ShowAllUser() ([]Core, error)
 	DeleteUser(deleteUser Core) (Core, error)
-	//Login(Nama, Password string) (Core, error)
+	Login(Nama, Password string) (Core, error)
 }

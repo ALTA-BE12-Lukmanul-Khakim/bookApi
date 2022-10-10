@@ -42,6 +42,26 @@ func (us *userService) AddUser(newUser domain.Core) (domain.Core, error) {
 	return res, nil
 }
 
+// Login implements domain.Service
+func (us *userService) Login(Nama string, Password string) (domain.Core, error) {
+	var user domain.Core
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
+	if err != nil {
+		log.Error(err.Error())
+		return domain.Core{}, errors.New("incorrect password")
+	}
+	//resToken :=
+	res, err := us.qry.GetUser(user.Nama, user.Password)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			return domain.Core{}, errors.New("rejected from database")
+		}
+		return domain.Core{}, errors.New("some problem on database")
+	}
+
+	return res, nil
+}
+
 // Update Data User
 func (us *userService) UpdateProfile(updatedData domain.Core) (domain.Core, error) {
 	if updatedData.Password != "" {
