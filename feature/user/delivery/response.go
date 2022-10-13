@@ -21,12 +21,20 @@ type RegisterResponse struct {
 	HP   string `json:"hp"`
 }
 
+type LoginResponse struct {
+	ID   uint   `json:"id"`
+	Nama string `json:"nama"`
+}
+
 func ToResponse(core interface{}, code string) interface{} {
 	var res interface{}
 	switch code {
 	case "reg":
 		cnv := core.(domain.Core)
 		res = RegisterResponse{ID: cnv.ID, Nama: cnv.Nama, HP: cnv.HP}
+	case "login":
+		cnv := core.(domain.Core)
+		res = LoginResponse{ID: cnv.ID, Nama: cnv.Nama}
 	case "all":
 		var arr []RegisterResponse
 		cnv := core.([]domain.Core)

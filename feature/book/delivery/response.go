@@ -21,6 +21,11 @@ type AddBookResponse struct {
 	Author string `json:"author"`
 }
 
+type EditBookResponse struct {
+	Judul  string `json:"judul"`
+	Author string `json:"author"`
+}
+
 func ToResponse(basic interface{}, code string) interface{} {
 	var res interface{}
 	switch code {
@@ -34,6 +39,9 @@ func ToResponse(basic interface{}, code string) interface{} {
 			arr = append(arr, AddBookResponse{ID: val.ID, Judul: val.Judul, Author: val.Author})
 		}
 		res = arr
+	case "edit":
+		cnv := basic.(domain.Basic)
+		res = EditBookResponse{Judul: cnv.Judul, Author: cnv.Author}
 	}
 
 	return res

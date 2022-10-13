@@ -3,6 +3,7 @@ package delivery
 import (
 	"bookapi/feature/user/domain"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,7 +16,7 @@ func New(e *echo.Echo, srv domain.Service) {
 	handler := userHandler{srv: srv}
 	e.POST("/register", handler.Register())
 	e.POST("/login", handler.Login())
-	e.PUT("/users", handler.UpdateProfile())
+	e.PUT("/users/:id", handler.UpdateProfile())
 	e.GET("/users/:id", handler.Profile())
 	e.GET("/users", handler.ShowAllUser())
 	e.DELETE("/users", handler.DeleteUser())
@@ -45,24 +46,26 @@ func (us *userHandler) Login() echo.HandlerFunc {
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(http.StatusBadRequest, FailResponse("cannot bind input"))
 		}
-		cnv := ToDomain(input)
-		res, err := us.srv.Login(cnv.Nama, cnv.Password)
+		//cnv := ToDomain(input)
+		res, err := us.srv.Login(domain.Core{Nama: input.Nama, Password: input.Password})
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 		}
-		return c.JSON(http.StatusCreated, SuccessResponse("berhasil login", res.Nama))
+		return c.JSON(http.StatusCreated, SuccessResponse("berhasil login", ToResponse(res, "login")))
 	}
 }
 
 // update user
 func (us *userHandler) UpdateProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var up RegisterFormat
+		var up UpdateFormat
+		ID, err := strconv.Atoi(c.Param("id"))
 		if err := c.Bind(&up); err != nil {
 			return c.JSON(http.StatusBadRequest, FailResponse("Cant bind update data"))
 		}
+
 		cnv := ToDomain(up)
-		res, err := us.srv.UpdateProfile(cnv)
+		res, err := us.srv.UpdateProfile(cnv, uint(ID))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 
@@ -74,13 +77,14 @@ func (us *userHandler) UpdateProfile() echo.HandlerFunc {
 // ambil ID User
 func (us *userHandler) Profile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var ID uint
-		res, err := us.srv.Profile(ID)
+
+		ID, err := strconv.Atoi(c.Param("id"))
+		res, err := us.srv.Profile(uint(ID))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 		}
 
-		return c.JSON(http.StatusFound, SuccessResponse("berhasil menemukan data", res))
+		return c.JSON(http.StatusOK, SuccessResponse("berhasil menemukan data", res))
 	}
 }
 

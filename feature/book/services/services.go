@@ -54,27 +54,6 @@ func (bs *bookService) AllBook() ([]domain.Basic, error) {
 
 }
 
-// DeleteBook implements domain.Service
-func (bs *bookService) DeleteBook(ID uint) (domain.Basic, error) {
-	res, err := bs.qry.Delete(ID)
-	if err != nil {
-		log.Error(err.Error())
-		return domain.Basic{}, err
-	}
-	return res, nil
-}
-
-// EditBook implements domain.Service
-func (bs *bookService) EditBook(updatedBook domain.Basic) (domain.Basic, error) {
-	res, err := bs.qry.Update(updatedBook)
-	if err != nil {
-		if strings.Contains(err.Error(), "column") {
-			return domain.Basic{}, errors.New("rejected from database")
-		}
-	}
-	return res, nil
-}
-
 // ThisBook implements domain.Service
 func (bs *bookService) ThisBook(ID uint) (domain.Basic, error) {
 	res, err := bs.qry.GetBook(ID)
@@ -87,5 +66,28 @@ func (bs *bookService) ThisBook(ID uint) (domain.Basic, error) {
 		}
 	}
 
+	return res, nil
+}
+
+// EditBook implements domain.Service
+func (bs *bookService) EditBook(updatedBook domain.Basic, ID uint) (domain.Basic, error) {
+	res, err := bs.qry.Update(updatedBook, ID)
+	if err != nil {
+		if strings.Contains(err.Error(), "column") {
+			return domain.Basic{}, errors.New("rejected from database")
+		}
+	}
+	return res, nil
+}
+
+// DeleteBook implements domain.Service
+func (bs *bookService) DeleteBook(ID uint) (domain.Basic, error) {
+	res, err := bs.qry.DeleteB(ID)
+	if err != nil {
+		log.Error(err.Error())
+		if strings.Contains(err.Error(), "column") {
+			return domain.Basic{}, errors.New("rejected from database")
+		}
+	}
 	return res, nil
 }

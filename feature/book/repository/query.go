@@ -16,22 +16,6 @@ func New(dbConn *gorm.DB) domain.Repository {
 	}
 }
 
-// Delete implements domain.Repository
-func (rq *repoQuery) Delete(ID uint) (domain.Basic, error) {
-	var resQry Book
-	if err := rq.db.First(&resQry, "ID = ?", ID).Error; err != nil {
-		return domain.Basic{}, err
-	}
-
-	if err := rq.db.Delete(&resQry).Error; err != nil {
-		return domain.Basic{}, err
-	}
-
-	res := ToDomain(resQry)
-	return res, nil
-
-}
-
 // GetAll implements domain.Repository
 func (rq *repoQuery) GetAll() ([]domain.Basic, error) {
 	var resQry []Book
@@ -68,23 +52,35 @@ func (rq *repoQuery) Insert(newBook domain.Basic) (domain.Basic, error) {
 }
 
 // Update implements domain.Repository
-func (rq *repoQuery) Update(updatedBook domain.Basic) (domain.Basic, error) {
-	var cnv Book
-	cnv = FromDomain(updatedBook)
-	if err := rq.db.Save(&cnv).Error; err != nil {
+func (rq *repoQuery) Update(updatedBook domain.Basic, ID uint) (domain.Basic, error) {
+	var new Book
+	if err := rq.db.First(&new, "ID = ?", ID).Error; err != nil {
+		return domain.Basic{}, err
+	}
+
+	new.Judul = updatedBook.Judul
+	new.Author = updatedBook.Author
+
+	if err := rq.db.Save(&new).Error; err != nil {
 		return domain.Basic{}, err
 	}
 	// selesai dari DB
-	updatedBook = ToDomain(cnv)
-	return updatedBook, nil
+	reUp := ToDomain(new)
+	return reUp, nil
 }
 
-// func (rq *repoQuery) Get(ID uint) (domain.Basic, error) {
-// 	var resQry Book
-// 	if err := rq.db.First(&resQry, "ID = ?", ID).Error; err != nil {
-// 		return domain.Basic{}, err
-// 	}
-// 	// selesai dari DB
-// 	res := ToDomain(resQry)
-// 	return res, nil
-// }
+// Delete implements domain.Repository
+func (rq *repoQuery) DeleteB(ID uint) (domain.Basic, error) {
+	var resQry Book
+	if err := rq.db.First(&resQry, "ID = ?", ID).Error; err != nil {
+		return domain.Basic{}, err
+	}
+
+	if err := rq.db.Delete(&resQry).Error; err != nil {
+		return domain.Basic{}, err
+	}
+
+	res := ToDomain(resQry)
+	return res, nil
+
+}

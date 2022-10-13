@@ -43,27 +43,26 @@ func (us *userService) AddUser(newUser domain.Core) (domain.Core, error) {
 }
 
 // Login implements domain.Service
-func (us *userService) Login(Nama string, Password string) (domain.Core, error) {
-	var user domain.Core
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
+func (us *userService) Login(newUser domain.Core) (domain.Core, error) {
+	res, err := us.qry.GetUser(newUser)
+	if err != nil {
+		if strings.Contains(err.Error(), "table") {
+			return domain.Core{}, errors.New("database error")
+		} else if strings.Contains(err.Error(), "found") {
+			return domain.Core{}, errors.New("no data")
+		}
+	}
+	//resToken :=
+	err = bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(newUser.Password))
 	if err != nil {
 		log.Error(err.Error())
 		return domain.Core{}, errors.New("incorrect password")
 	}
-	//resToken :=
-	res, err := us.qry.GetUser(user.Nama, user.Password)
-	if err != nil {
-		if strings.Contains(err.Error(), "duplicate") {
-			return domain.Core{}, errors.New("rejected from database")
-		}
-		return domain.Core{}, errors.New("some problem on database")
-	}
-
 	return res, nil
 }
 
 // Update Data User
-func (us *userService) UpdateProfile(updatedData domain.Core) (domain.Core, error) {
+func (us *userService) UpdateProfile(updatedData domain.Core, ID uint) (domain.Core, error) {
 	if updatedData.Password != "" {
 		generate, err := bcrypt.GenerateFromPassword([]byte(updatedData.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -72,12 +71,14 @@ func (us *userService) UpdateProfile(updatedData domain.Core) (domain.Core, erro
 		}
 		updatedData.Password = string(generate)
 	}
+	//updatedData.Nama =
 
-	res, err := us.qry.Update(updatedData)
+	res, err := us.qry.Update(updatedData, ID)
 	if err != nil {
 		if strings.Contains(err.Error(), "column") {
 			return domain.Core{}, errors.New("rejected from database")
 		}
+		return domain.Core{}, errors.New("some problem on database")
 	}
 
 	return res, nil
