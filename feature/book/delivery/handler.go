@@ -20,7 +20,7 @@ func New(e *echo.Echo, srv domain.Service) {
 	e.POST("/books", handler.AddBook())
 	e.GET("/books/:id", handler.ThisBook())
 	e.PUT("/books/:id", handler.EditBook())
-	e.DELETE("/books:/id", handler.DeleteBook())
+	e.DELETE("/books/:id", handler.DeleteBook())
 
 }
 
@@ -86,9 +86,6 @@ func (bs *bookHandler) EditBook() echo.HandlerFunc {
 func (bs *bookHandler) DeleteBook() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ID, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, FailResponse(err.Error()))
-		}
 		if _, err = bs.srv.DeleteBook(uint(ID)); err != nil {
 			return c.JSON(http.StatusBadRequest, FailResponse(err.Error()))
 		}

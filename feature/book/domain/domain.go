@@ -12,7 +12,7 @@ type Repository interface {
 	GetAll() ([]Basic, error)
 	GetBook(ID uint) (Basic, error)
 	Update(updatedBook Basic, ID uint) (Basic, error)
-	DeleteB(ID uint) (Basic, error)
+	Delete(ID uint) (Basic, error)
 }
 
 type Service interface {

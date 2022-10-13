@@ -3,6 +3,7 @@ package repository
 import (
 	"bookapi/feature/book/domain"
 
+	"github.com/labstack/gommon/log"
 	"gorm.io/gorm"
 )
 
@@ -70,17 +71,18 @@ func (rq *repoQuery) Update(updatedBook domain.Basic, ID uint) (domain.Basic, er
 }
 
 // Delete implements domain.Repository
-func (rq *repoQuery) DeleteB(ID uint) (domain.Basic, error) {
+func (rq *repoQuery) Delete(ID uint) (domain.Basic, error) {
 	var resQry Book
 	if err := rq.db.First(&resQry, "ID = ?", ID).Error; err != nil {
-		return domain.Basic{}, err
+		log.Error(err.Error())
+		return ToDomain(resQry), err
 	}
 
 	if err := rq.db.Delete(&resQry).Error; err != nil {
-		return domain.Basic{}, err
+		log.Error(err.Error())
+		return ToDomain(resQry), err
 	}
-
-	res := ToDomain(resQry)
-	return res, nil
+	//res := ToDomain(resQry)
+	return ToDomain(resQry), nil
 
 }

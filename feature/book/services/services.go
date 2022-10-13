@@ -82,7 +82,7 @@ func (bs *bookService) EditBook(updatedBook domain.Basic, ID uint) (domain.Basic
 
 // DeleteBook implements domain.Service
 func (bs *bookService) DeleteBook(ID uint) (domain.Basic, error) {
-	res, err := bs.qry.DeleteB(ID)
+	res, err := bs.qry.Delete(ID)
 	if err != nil {
 		log.Error(err.Error())
 		if strings.Contains(err.Error(), "column") {
